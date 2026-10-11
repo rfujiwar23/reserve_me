@@ -4,14 +4,14 @@ import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
-// Updated session list with images, dates, and times (Mocked for Oct/Nov 2026)
-const sessionList = [
-  { id: 'anime', icon: '🎤', image: 'https://images.unsplash.com/photo-1598387181032-a3103a2db5b3?auto=format&fit=crop&q=80&w=800', date: '2026-10-24', time: '19:00 - 22:00' },
-  { id: 'pop90', icon: '💿', image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&q=80&w=800', date: '2026-10-31', time: '18:00 - 21:00' },
-  { id: 'pop70', icon: '🎸', image: 'https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&q=80&w=800', date: '2026-11-07', time: '19:00 - 22:00' },
-  { id: 'jazz', icon: '🎷', image: 'https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?auto=format&fit=crop&q=80&w=800', date: '2026-11-14', time: '18:30 - 21:30' },
-  { id: 'country', icon: '🤠', image: 'https://images.unsplash.com/photo-1559184511-b1e779f64834?auto=format&fit=crop&q=80&w=800', date: '2026-11-21', time: '19:00 - 22:00' }
-]
+// Made reactive with ref() and added `imageError: false` to track broken links
+const sessionList = ref([
+  { id: 'anime', icon: '🎤', image: 'https://images.unsplash.com/photo-1598387181032-a3103a2db5b3?auto=format&fit=crop&q=80&w=800', date: '2026-10-24', time: '19:00 - 22:00', imageError: false },
+  { id: 'pop90', icon: '💿', image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&q=80&w=800', date: '2026-10-31', time: '18:00 - 21:00', imageError: false },
+  { id: 'pop70', icon: '🎸', image: 'https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&q=80&w=800', date: '2026-11-07', time: '19:00 - 22:00', imageError: false },
+  { id: 'jazz', icon: '🎷', image: 'https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?auto=format&fit=crop&q=80&w=800', date: '2026-11-14', time: '18:30 - 21:30', imageError: false },
+  { id: 'country', icon: '🤠', image: 'https://images.unsplash.com/photo-1559184511-b1e779f64834?auto=format&fit=crop&q=80&w=800', date: '2026-11-21', time: '19:00 - 22:00', imageError: false }
+])
 
 const selectedSession = ref<string | null>(null)
 const isSubmitted = ref(false)
@@ -64,16 +64,25 @@ const submitBooking = () => {
     <div class="ig-grid">
       <div v-for="session in sessionList" :key="session.id" class="ig-card">
         
-        <!-- Header: Avatar & Username mimic -->
         <div class="ig-card-header">
           <div class="ig-avatar">{{ session.icon }}</div>
           <span class="ig-username">JamStationLive</span>
         </div>
 
-        <!-- Image -->
-        <img :src="session.image" :alt="t(`sessions.${session.id}`)" class="ig-image" loading="lazy" />
+        <!-- Image with @error fallback logic -->
+        <img 
+          v-if="!session.imageError"
+          :src="session.image" 
+          :alt="t(`sessions.${session.id}`)" 
+          class="ig-image" 
+          @error="session.imageError = true"
+          loading="lazy" 
+        />
+        <!-- Grayish background fallback when link breaks -->
+        <div v-else class="ig-image-fallback">
+          <span class="fallback-title">{{ t(`sessions.${session.id}`) }}</span>
+        </div>
 
-        <!-- Content -->
         <div class="ig-card-body">
           <div class="ig-actions">
             <span class="heart-icon">❤️</span>
@@ -84,7 +93,7 @@ const submitBooking = () => {
           <h4 class="ig-title">{{ t(`sessions.${session.id}`) }}</h4>
           
           <p class="ig-description">
-            <strong>studio_vue_live</strong> {{ t(`sessions.${session.id}Desc`) }}
+            <strong>JamStationLive</strong> {{ t(`sessions.${session.id}Desc`) }}
           </p>
 
           <div class="ig-meta">
@@ -100,7 +109,7 @@ const submitBooking = () => {
       </div>
     </div>
 
-    <!-- Booking Modal Overlay (Unchanged Form Logic) -->
+    <!-- Booking Modal Overlay -->
     <div v-if="selectedSession" class="modal-overlay" @click.self="closeBookingModal">
       <div class="modal-content">
         
@@ -212,10 +221,13 @@ const submitBooking = () => {
 </template>
 
 <style scoped>
+
+/* Import the external modal styles */
+@import '../assets/booking-modal.css';
+
 .sessions-container { max-width: 1000px; margin: 0 auto; position: relative; }
 .subtitle { text-align: center; margin-bottom: 3rem; font-size: 1.2rem; color: #555; }
 
-/* IG Grid & Cards */
 .ig-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -233,27 +245,9 @@ const submitBooking = () => {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
-.ig-card-header {
-  display: flex;
-  align-items: center;
-  padding: 0.8rem 1rem;
-  gap: 0.8rem;
-}
-.ig-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 0.9rem;
-  color: white;
-}
-.ig-username {
-  font-weight: 600;
-  font-size: 0.9rem;
-}
+.ig-card-header { display: flex; align-items: center; padding: 0.8rem 1rem; gap: 0.8rem; }
+.ig-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); display: flex; justify-content: center; align-items: center; font-size: 0.9rem; color: white; }
+.ig-username { font-weight: 600; font-size: 0.9rem; }
 
 .ig-image {
   width: 100%;
@@ -263,169 +257,31 @@ const submitBooking = () => {
   border-bottom: 1px solid #efefef;
 }
 
-.ig-card-body {
-  padding: 1rem;
-}
-.ig-actions {
-  display: flex;
-  gap: 1rem;
-  font-size: 1.2rem;
-  margin-bottom: 0.8rem;
-  cursor: pointer;
-}
-.ig-title {
-  margin: 0 0 0.5rem 0;
-  font-size: 1rem;
-  font-weight: 700;
-}
-.ig-description {
-  margin: 0 0 0.8rem 0;
-  font-size: 0.9rem;
-  line-height: 1.4;
-}
-.ig-meta {
-  display: flex;
-  gap: 1rem;
-  font-size: 0.8rem;
-  color: #8e8e8e;
-  margin-bottom: 1rem;
-}
-.ig-book-btn {
+/* Fallback Styles for Broken Images */
+.ig-image-fallback {
   width: 100%;
-  padding: 0.6rem;
-  background-color: #42b883;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
+  aspect-ratio: 1 / 1;
+  background-color: #e0e0e0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-top: 1px solid #efefef;
+  border-bottom: 1px solid #efefef;
+  padding: 2rem;
+  text-align: center;
 }
+.fallback-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #666;
+}
+
+.ig-card-body { padding: 1rem; }
+.ig-actions { display: flex; gap: 1rem; font-size: 1.2rem; margin-bottom: 0.8rem; cursor: pointer; }
+.ig-title { margin: 0 0 0.5rem 0; font-size: 1rem; font-weight: 700; }
+.ig-description { margin: 0 0 0.8rem 0; font-size: 0.9rem; line-height: 1.4; }
+.ig-meta { display: flex; gap: 1rem; font-size: 0.8rem; color: #8e8e8e; margin-bottom: 1rem; }
+.ig-book-btn { width: 100%; padding: 0.6rem; background-color: #42b883; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
 .ig-book-btn:hover { background-color: #3aa876; }
-
-/* Modal Styles */
-.modal-overlay { 
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%; 
-    background: rgba(0, 0, 0, 0.6); 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    z-index: 1000; 
-}
-.modal-content { 
-    background: white; 
-    padding: 2rem; 
-    border-radius: 12px; 
-    width: 90%; 
-    max-width: 500px; 
-    color: #333; 
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
-}
-.modal-content h3 { 
-    margin-top: 0; 
-    margin-bottom: 1.5rem; 
-    font-size: 1.4rem; 
-    border-bottom: 2px solid #42b883; 
-    padding-bottom: 0.5rem; 
-}
-
-.booking-form { 
-    display: flex; 
-    flex-direction: column; 
-    gap: 1.2rem; }
-
-.form-row { 
-    display: flex; 
-    gap: 1rem; 
-}
-
-.half-width { 
-    flex: 1; 
-}
-
-.form-group { 
-    display: flex; 
-    flex-direction: column; 
-    gap: 0.4rem; 
-}
-.form-group label { 
-    font-weight: bold; 
-    font-size: 0.9rem; 
-}
-
-.form-group input, .form-group select { 
-    padding: 0.75rem; 
-    border: 1px solid #ccc; 
-    border-radius: 6px; 
-    font-size: 1rem; 
-}
-.instrument-logic-section { 
-    margin-top: 0.5rem; 
-    padding: 1rem; 
-    background-color: #f9f9f9; 
-    border-radius: 8px; 
-    border-left: 4px solid #42b883; 
-}
-
-.checkbox-group { 
-    display: flex; 
-    align-items: center; 
-    gap: 0.5rem; 
-    font-size: 0.95rem; 
-}
-.info-text { 
-    margin: 0; 
-    font-size: 0.9rem; 
-    font-weight: bold; 
-}
-
-.success-text { 
-    color: #2e8b57; 
-}
-
-.warning-text { 
-    color: #d9534f; 
-}
-
-.form-actions { 
-    display: flex; 
-    justify-content: flex-end; 
-    gap: 1rem; 
-    margin-top: 1rem; 
-}
-
-.submit-btn, .cancel-btn, .close-btn { 
-    padding: 0.75rem 1.5rem; 
-    border-radius: 6px; 
-    border: none; 
-    font-size: 1rem; 
-    cursor: pointer; 
-}
-
-.submit-btn { 
-    background-color: #42b883; 
-    color: white; 
-    font-weight: bold; 
-}
-
-.cancel-btn { 
-    background-color: #f1f1f1; 
-    color: #333; 
-}
-
-.close-btn { 
-    background-color: #333; 
-    color: white; 
-    margin-top: 1rem; 
-    width: 100%; 
-}
-
-.success-message { 
-    text-align: center; 
-}
 
 </style>
