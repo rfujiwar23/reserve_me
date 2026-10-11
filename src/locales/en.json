@@ -26,6 +26,21 @@
     "pop90": "90s Pop",
     "pop70": "70s Pop",
     "jazz": "Jazz Standards",
-    "country": "Country & Acoustic"
+    "country": "Country & Acoustic",
+    "bookTitle": "Book: {session}",
+    "name": "Name",
+    "email": "Email",
+    "instrument": "Instrument",
+    "instruments": {
+      "vocal": "Vocals",
+      "guitar": "Guitar",
+      "bass": "Bass",
+      "piano": "Piano / Keyboard",
+      "drums": "Drums",
+      "other": "Other"
+    },
+    "submit": "Confirm Booking",
+    "cancel": "Cancel",
+    "success": "Booking confirmed! We look forward to seeing you."
   }
 }
