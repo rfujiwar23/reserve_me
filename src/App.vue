@@ -11,7 +11,7 @@ const toggleLanguage = () => {
 
 <template>
   <header class="header">
-    <div class="logo">JamStation</div>
+    <div class="logo">🎥 Studio VUE</div>
     <nav>
       <RouterLink to="/">{{ $t('nav.home') }}</RouterLink>
       <RouterLink to="/plans">{{ $t('nav.plans') }}</RouterLink>
