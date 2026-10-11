@@ -1,0 +1,31 @@
+{
+  "nav": {
+    "home": "Home",
+    "plans": "Plans",
+    "sessions": "Session Nights"
+  },
+  "hero": {
+    "title": "Your Music, Captured Perfectly.",
+    "subtitle": "Premium practice studio equipped with video shooting. Relive the moment you fell in love with music.",
+    "book": "Book Now"
+  },
+  "plans": {
+    "title": "Pricing & Plans",
+    "band": "Band Plan",
+    "bandDesc": "Spacious room for full bands, includes multi-angle video recording.",
+    "solo": "Solo & Piano Plan",
+    "soloDesc": "Features a Grand Piano. Perfect for focused individual practice.",
+    "onetime": "One-Time User",
+    "member": "Premium Member (Monthly)",
+    "memberDesc": "Discounted rates, priority booking, and free entry to session nights."
+  },
+  "sessions": {
+    "title": "Themed Live Session Nights",
+    "subtitle": "Relive your college music days. From beginners to former pros, let's jam together!",
+    "anime": "Anime Music Night",
+    "pop90": "90s Pop",
+    "pop70": "70s Pop",
+    "jazz": "Jazz Standards",
+    "country": "Country & Acoustic"
+  }
+}
