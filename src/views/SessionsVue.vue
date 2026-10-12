@@ -66,7 +66,7 @@ const submitBooking = () => {
         
         <div class="ig-card-header">
           <div class="ig-avatar">{{ session.icon }}</div>
-          <span class="ig-username">JamStationLive</span>
+          <span class="ig-username">JamStation Live</span>
         </div>
 
         <!-- Image with @error fallback logic -->
@@ -78,10 +78,15 @@ const submitBooking = () => {
           @error="session.imageError = true"
           loading="lazy" 
         />
-        <!-- Grayish background fallback when link breaks -->
-        <div v-else class="ig-image-fallback">
-          <span class="fallback-title">{{ t(`sessions.${session.id}`) }}</span>
-        </div>
+        
+        <!-- Local fallback image when link breaks -->
+        <img 
+          v-else 
+          src="../assets/fallback_img.jpg" 
+          :alt="t(`sessions.${session.id}`)" 
+          class="ig-image" 
+          loading="lazy" 
+        />
 
         <div class="ig-card-body">
           <div class="ig-actions">
@@ -93,7 +98,7 @@ const submitBooking = () => {
           <h4 class="ig-title">{{ t(`sessions.${session.id}`) }}</h4>
           
           <p class="ig-description">
-            <strong>JamStationLive</strong> {{ t(`sessions.${session.id}Desc`) }}
+            <strong>JamStation Live</strong> {{ t(`sessions.${session.id}Desc`) }}
           </p>
 
           <div class="ig-meta">
@@ -221,8 +226,6 @@ const submitBooking = () => {
 </template>
 
 <style scoped>
-
-/* Import the external modal styles */
 @import '../assets/booking-modal.css';
 
 .sessions-container { max-width: 1000px; margin: 0 auto; position: relative; }
@@ -257,25 +260,6 @@ const submitBooking = () => {
   border-bottom: 1px solid #efefef;
 }
 
-/* Fallback Styles for Broken Images */
-.ig-image-fallback {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  background-color: #e0e0e0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-top: 1px solid #efefef;
-  border-bottom: 1px solid #efefef;
-  padding: 2rem;
-  text-align: center;
-}
-.fallback-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #666;
-}
-
 .ig-card-body { padding: 1rem; }
 .ig-actions { display: flex; gap: 1rem; font-size: 1.2rem; margin-bottom: 0.8rem; cursor: pointer; }
 .ig-title { margin: 0 0 0.5rem 0; font-size: 1rem; font-weight: 700; }
@@ -283,5 +267,4 @@ const submitBooking = () => {
 .ig-meta { display: flex; gap: 1rem; font-size: 0.8rem; color: #8e8e8e; margin-bottom: 1rem; }
 .ig-book-btn { width: 100%; padding: 0.6rem; background-color: #42b883; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
 .ig-book-btn:hover { background-color: #3aa876; }
-
 </style>
