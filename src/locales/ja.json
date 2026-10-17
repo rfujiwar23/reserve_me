@@ -19,7 +19,19 @@
     "trialDesc": "初めての方限定。スタジオの設備や環境をお試しいただけます。（最大3時間まで）",
     "onetime": "ワンタイム（都度利用）",
     "member": "プレミアム会員 (月額)",
-    "memberDesc": "お得な会員価格と優先予約、セッションへの無料参加。"
+    "memberDesc": "お得な会員価格と優先予約、セッションへの無料参加。",
+    "selectPlanBtn": "このプランを選ぶ",
+    "signupTitle": "プランお申し込み: {plan}",
+    "firstName": "名",
+    "lastName": "姓",
+    "email": "メールアドレス",
+    "submitSignup": "申し込む",
+    "cancel": "キャンセル",
+    "successSignup": "お申し込みありがとうございます！詳細をメールでお送りしました。",
+    "orContinueWith": "または以下のアカウントで登録",
+    "signupGoogle": "Googleで登録",
+    "signupApple": "Appleで登録",
+    "signupMicrosoft": "Microsoftで登録"
   },
   "sessions": {
     "title": "テーマ別 セッション・ナイト",

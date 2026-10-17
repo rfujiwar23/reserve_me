@@ -19,7 +19,19 @@
     "trialDesc": "First-time users only. Test out our premium studio environment. (3 hours max)",
     "onetime": "One-Time User",
     "member": "Premium Member (Monthly)",
-    "memberDesc": "Discounted rates, priority booking, and free entry to session nights."
+    "memberDesc": "Discounted rates, priority booking, and free entry to session nights.",
+    "selectPlanBtn": "Select Plan",
+    "signupTitle": "Sign up for: {plan}",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email Address",
+    "submitSignup": "Sign Up",
+    "cancel": "Cancel",
+    "successSignup": "Thank you for signing up! We've sent the details to your email.",
+    "orContinueWith": "Or continue with",
+    "signupGoogle": "Sign up with Google",
+    "signupApple": "Sign up with Apple",
+    "signupMicrosoft": "Sign up with Microsoft"
   },
   "sessions": {
     "title": "Themed Live Session Nights",
