@@ -4,9 +4,10 @@ import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
-// State for the sign-up modal
 const selectedPlan = ref<string | null>(null)
-const isSubmitted = ref(false)
+
+// Step tracking: 1 = Info, 2 = Payment, 3 = Confirm, 4 = Success
+const signupStep = ref(1)
 
 const signupForm = ref({
   firstName: '',
@@ -14,27 +15,48 @@ const signupForm = ref({
   email: ''
 })
 
+const paymentForm = ref({
+  method: 'card', // 'card' or 'paypay'
+  cardNumber: '',
+  expiry: '',
+  cvc: ''
+})
+
 const openSignupModal = (planId: string) => {
   selectedPlan.value = planId
-  isSubmitted.value = false
+  signupStep.value = 1
 }
 
 const closeSignupModal = () => {
   selectedPlan.value = null
+  signupStep.value = 1
   signupForm.value = { firstName: '', lastName: '', email: '' }
+  paymentForm.value = { method: 'card', cardNumber: '', expiry: '', cvc: '' }
 }
 
-const submitSignup = () => {
-  console.log('Signup Payload:', {
+const proceedToPayment = () => {
+  signupStep.value = 2
+}
+
+const handleSocialLogin = (provider: string) => {
+  // Mock filling the form based on social provider
+  signupForm.value.firstName = provider
+  signupForm.value.lastName = 'User'
+  signupForm.value.email = `mockuser@${provider.toLowerCase()}.com`
+  signupStep.value = 2 // Proceed straight to payment
+}
+
+const proceedToConfirm = () => {
+  signupStep.value = 3
+}
+
+const submitFinalRegistration = () => {
+  console.log('Final Registration Payload:', {
     plan: selectedPlan.value,
-    ...signupForm.value
+    ...signupForm.value,
+    ...paymentForm.value
   })
-  isSubmitted.value = true
-}
-
-const socialSignup = (provider: string) => {
-  console.log(`OAuth Signup with ${provider} for plan: ${selectedPlan.value}`)
-  isSubmitted.value = true
+  signupStep.value = 4 // Show success message
 }
 </script>
 
@@ -83,60 +105,117 @@ const socialSignup = (provider: string) => {
     <div v-if="selectedPlan" class="modal-overlay" @click.self="closeSignupModal">
       <div class="modal-content">
         
-        <div v-if="isSubmitted" class="success-message">
+        <!-- STEP 4: Success -->
+        <div v-if="signupStep === 4" class="success-message">
           <h3>🎉 {{ t('plans.successSignup') }}</h3>
           <button @click="closeSignupModal" class="close-btn">{{ t('plans.cancel') }}</button>
         </div>
 
+        <!-- STEP 1 to 3 Wrapper -->
         <div v-else>
-          <h3>{{ t('plans.signupTitle', { plan: t(`plans.${selectedPlan}`) }) }}</h3>
-          
-          <!-- Standard Email Registration -->
-          <form @submit.prevent="submitSignup" class="booking-form">
-            <div class="form-row">
-              <div class="form-group half-width">
-                <label for="firstName">{{ t('plans.firstName') }} *</label>
-                <input type="text" id="firstName" v-model="signupForm.firstName" required />
+          <!-- STEP 1: Personal Info -->
+          <div v-if="signupStep === 1">
+            <h3>{{ t('plans.signupTitle', { plan: t(`plans.${selectedPlan}`) }) }}</h3>
+            <form @submit.prevent="proceedToPayment" class="booking-form">
+              <div class="form-row">
+                <div class="form-group half-width">
+                  <label for="firstName">{{ t('plans.firstName') }} *</label>
+                  <input type="text" id="firstName" v-model="signupForm.firstName" required />
+                </div>
+                <div class="form-group half-width">
+                  <label for="lastName">{{ t('plans.lastName') }} *</label>
+                  <input type="text" id="lastName" v-model="signupForm.lastName" required />
+                </div>
               </div>
-              <div class="form-group half-width">
-                <label for="lastName">{{ t('plans.lastName') }} *</label>
-                <input type="text" id="lastName" v-model="signupForm.lastName" required />
+              <div class="form-group">
+                <label for="email">{{ t('plans.email') }} *</label>
+                <input 
+                  type="email" 
+                  id="email" 
+                  v-model="signupForm.email" 
+                  pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
+                  required 
+                />
               </div>
-            </div>
+              <div class="form-actions">
+                <button type="button" @click="closeSignupModal" class="cancel-btn">{{ t('plans.cancel') }}</button>
+                <button type="submit" class="submit-btn">{{ t('plans.nextStep') }}</button>
+              </div>
+            </form>
 
-            <div class="form-group">
-              <label for="email">{{ t('plans.email') }} *</label>
-              <input 
-                type="email" 
-                id="email" 
-                v-model="signupForm.email" 
-                pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
-                required 
-              />
+            <div class="divider">
+              <span>{{ t('plans.orContinueWith') }}</span>
+            </div>
+            <div class="social-login-group">
+              <button type="button" class="social-btn google" @click="handleSocialLogin('Google')">🌐 {{ t('plans.signupGoogle') }}</button>
+              <button type="button" class="social-btn apple" @click="handleSocialLogin('Apple')">🍏 {{ t('plans.signupApple') }}</button>
+              <button type="button" class="social-btn microsoft" @click="handleSocialLogin('Microsoft')">🪟 {{ t('plans.signupMicrosoft') }}</button>
+            </div>
+          </div>
+
+          <!-- STEP 2: Payment -->
+          <div v-else-if="signupStep === 2">
+            <h3>{{ t('plans.paymentTitle') }}</h3>
+            <form @submit.prevent="proceedToConfirm" class="booking-form">
+              
+              <div class="form-group">
+                <label>
+                  <input type="radio" value="card" v-model="paymentForm.method" />
+                  {{ t('plans.creditCard') }}
+                </label>
+                <label>
+                  <input type="radio" value="paypay" v-model="paymentForm.method" />
+                  {{ t('plans.paypay') }}
+                </label>
+              </div>
+
+              <!-- Credit Card Fields -->
+              <div v-if="paymentForm.method === 'card'" class="payment-fields">
+                <div class="form-group">
+                  <label for="cardNumber">{{ t('plans.cardNumber') }} *</label>
+                  <input type="text" id="cardNumber" v-model="paymentForm.cardNumber" placeholder="1234 5678 9101 1121" required />
+                </div>
+                <div class="form-row">
+                  <div class="form-group half-width">
+                    <label for="expiry">{{ t('plans.expiry') }} *</label>
+                    <input type="text" id="expiry" v-model="paymentForm.expiry" placeholder="MM/YY" required />
+                  </div>
+                  <div class="form-group half-width">
+                    <label for="cvc">{{ t('plans.cvc') }} *</label>
+                    <input type="text" id="cvc" v-model="paymentForm.cvc" placeholder="123" required />
+                  </div>
+                </div>
+              </div>
+
+              <!-- PayPay Note -->
+              <div v-else class="payment-fields paypay-note">
+                <p>{{ t('plans.paypayNote') }}</p>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" @click="signupStep = 1" class="cancel-btn">{{ t('plans.back') }}</button>
+                <button type="submit" class="submit-btn">{{ t('plans.nextStep') }}</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- STEP 3: Confirm Details -->
+          <div v-else-if="signupStep === 3">
+            <h3>{{ t('plans.confirmTitle') }}</h3>
+            
+            <div class="confirmation-summary">
+              <p><strong>{{ t('plans.selectedPlan') }}:</strong> {{ t(`plans.${selectedPlan}`) }}</p>
+              <p><strong>{{ t('plans.firstName') }} / {{ t('plans.lastName') }}:</strong> {{ signupForm.firstName }} {{ signupForm.lastName }}</p>
+              <p><strong>{{ t('plans.email') }}:</strong> {{ signupForm.email }}</p>
+              <p><strong>{{ t('plans.paymentTitle') }}:</strong> 
+                {{ paymentForm.method === 'card' ? t('plans.creditCard') : t('plans.paypay') }}
+              </p>
             </div>
 
             <div class="form-actions">
-              <button type="button" @click="closeSignupModal" class="cancel-btn">{{ t('plans.cancel') }}</button>
-              <button type="submit" class="submit-btn">{{ t('plans.submitSignup') }}</button>
+              <button type="button" @click="signupStep = 2" class="cancel-btn">{{ t('plans.back') }}</button>
+              <button type="button" @click="submitFinalRegistration" class="submit-btn">{{ t('plans.confirmAndPay') }}</button>
             </div>
-          </form>
-
-          <!-- Divider -->
-          <div class="divider">
-            <span>{{ t('plans.orContinueWith') }}</span>
-          </div>
-
-          <!-- OAuth Social Logins -->
-          <div class="social-login-group">
-            <button type="button" class="social-btn google" @click="socialSignup('Google')">
-              🌐 {{ t('plans.signupGoogle') }}
-            </button>
-            <button type="button" class="social-btn apple" @click="socialSignup('Apple')">
-              🍏 {{ t('plans.signupApple') }}
-            </button>
-            <button type="button" class="social-btn microsoft" @click="socialSignup('Microsoft')">
-              🪟 {{ t('plans.signupMicrosoft') }}
-            </button>
           </div>
 
         </div>
@@ -146,7 +225,6 @@ const socialSignup = (provider: string) => {
 </template>
 
 <style scoped>
-/* Reusing the modal base styles */
 @import '../assets/booking-modal.css';
 
 .plans-container h2 { 
@@ -218,7 +296,7 @@ const socialSignup = (provider: string) => {
   border: 2px solid #42b883;
 }
 
-/* OAuth specific styles */
+/* Modal specific overrides */
 .divider {
   display: flex;
   align-items: center;
@@ -261,4 +339,29 @@ const socialSignup = (provider: string) => {
 .social-btn.google { color: #db4437; }
 .social-btn.apple { color: #000000; }
 .social-btn.microsoft { color: #00a4ef; }
+
+/* Payment & Confirmation styles */
+.payment-fields {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+.paypay-note {
+  color: #555;
+  font-weight: 500;
+  text-align: center;
+}
+.confirmation-summary {
+  background-color: #f1f8f5;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #c3e6cb;
+}
+.confirmation-summary p {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  color: #333;
+}
 </style>
